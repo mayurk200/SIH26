@@ -112,9 +112,10 @@
       <div class="nd-chart"><canvas id="ndChart"></canvas><div class="nd-chart-lbl">Tilt (° last 60s)</div></div>
     </div>
     <div class="sc-info" id="scInfo">
-      <div class="sc-title">👋 Welcome — 20-Node Mine Simulator</div>
+      <div class="sc-title">👋 Welcome — 20-Node Mine Simulator <button class="sc-minimize" onclick="minimizeWelcome()" title="Minimize">−</button></div>
       <div class="sc-body">Select a <strong>test scenario</strong> from the left panel to begin.<br><br><strong>20 ESP32+LoRa nodes</strong> across <strong>3 mine zones</strong> (East: 7, West: 7, North: 6) with <strong>3 zone gateways</strong>.<br><br>• <strong>Click</strong> any node to inspect live sensor data<br>• <strong>Drag</strong> nodes to reposition<br>• Use <strong>L0–L3</strong> buttons for manual alerts<br>• <strong>Speed control</strong>: 1×–10× simulation speed<br>• <strong>Export JSON</strong> for test reports</div>
     </div>
+    <button class="sc-restore" id="scRestore" onclick="restoreWelcome()" title="Show Help">❓</button>
   </div>
 
   <!-- ══ RIGHT: METRICS + LOGS ══ -->

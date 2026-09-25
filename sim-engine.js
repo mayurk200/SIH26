@@ -301,6 +301,16 @@ function showND(n) {
 }
 function closeND() { document.getElementById('ndPanel').classList.remove('show'); selNode = null; }
 
+/* ── Welcome Popup Minimize/Restore ── */
+function minimizeWelcome() {
+  document.getElementById('scInfo').classList.add('minimized');
+  document.getElementById('scRestore').classList.add('show');
+}
+function restoreWelcome() {
+  document.getElementById('scInfo').classList.remove('minimized');
+  document.getElementById('scRestore').classList.remove('show');
+}
+
 function drawNDChart(n) {
   const cv2 = document.getElementById('ndChart');
   const cx2 = cv2.getContext('2d');
