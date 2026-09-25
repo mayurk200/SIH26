@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIH26025 — Mine Subsidence Real-Time Simulator (20-Node)</title>
+<meta name="description" content="Interactive simulation of AI-enabled mine subsidence monitoring system with 20 nodes, 3 zones, AODV routing, ML ensemble, and real-life incident recreations.">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="sim-styles.css">
+</head>
+<body>
+
+<header class="hdr">
+  <div class="hdr-left">
+    <span class="badge">SIH26025</span>
+    <div><h1>Mine Subsidence Real-Time Simulator</h1><div class="hdr-sub">20-Node · 3 Zones · AODV Ad-Hoc · 3-Model ML Ensemble · Real-Life Scenarios</div></div>
+  </div>
+  <div class="hdr-right">
+    <div class="speed-ctrl">
+      <button class="speed-btn active" onclick="setSpeed(1)">1×</button>
+      <button class="speed-btn" onclick="setSpeed(2)">2×</button>
+      <button class="speed-btn" onclick="setSpeed(5)">5×</button>
+      <button class="speed-btn" onclick="setSpeed(10)">10×</button>
+    </div>
+    <div class="timer-display" id="timerBox">
+      <span class="timer-icon" id="timerIcon">⏱️</span>
+      <span class="timer-val" id="timerVal">00:00.0</span>
+      <span class="timer-status" id="timerStatus">READY</span>
+    </div>
+    <button class="hdr-btn" onclick="exportJSON()">📋 Export JSON</button>
+    <button class="hdr-btn danger" onclick="resetAll()">⟳ Reset</button>
+  </div>
+</header>
+
+<div class="alert-bar l0" id="aBanner">
+  <span id="aIcon">✅</span>
+  <span id="aText">TARP Level L0 — NORMAL — All systems operational</span>
+  <span class="al-detail" id="aDetail">20/20 nodes · 0 anomalies · 3 gateways online</span>
+</div>
+
+<div class="main">
+
+  <!-- ══ LEFT: TEST CASES ══ -->
+  <div class="panel-l">
+    <div class="sec-title">⚡ Test Scenarios (21)</div>
+
+    <div class="grp">
+      <div class="grp-label">📡 Network & Communication</div>
+      <button class="tbtn" onclick="runT(1)" id="tb1"><span class="tnum">1</span><div class="tinfo"><div class="tname">Normal 20-Node Operation</div><div class="tdesc">All 20 nodes across 3 zones. AODV multi-hop. 3 gateways.</div></div><span class="ttag pass">PASS</span></button>
+      <button class="tbtn" onclick="runT(2)" id="tb2"><span class="tnum">2</span><div class="tinfo"><div class="tname">AODV Multi-Hop Discovery</div><div class="tdesc">E7→E6→E5→GW-E. 3-hop RREQ/RREP route setup.</div></div><span class="ttag info">DEMO</span></button>
+      <button class="tbtn" onclick="runT(3)" id="tb3"><span class="tnum">3</span><div class="tinfo"><div class="tname">Single Node Failure + Re-route</div><div class="tdesc">W3 dies. AODV RERR. Traffic via W2→W4→W5→GW-W.</div></div><span class="ttag warn">RECOVER</span></button>
+      <button class="tbtn" onclick="runT(4)" id="tb4"><span class="tnum">4</span><div class="tinfo"><div class="tname">Zone Gateway Failure</div><div class="tdesc">GW-North offline. N-zone cross-zone fallback to GW-East.</div></div><span class="ttag fail">DEGRADE</span></button>
+      <button class="tbtn" onclick="runT(5)" id="tb5"><span class="tnum">5</span><div class="tinfo"><div class="tname">LoRa Channel Saturation</div><div class="tdesc">20 nodes high-freq. 1% duty cycle. Adaptive SF + hopping.</div></div><span class="ttag warn">THROTTLE</span></button>
+    </div>
+
+    <div class="grp">
+      <div class="grp-label">🧠 AI/ML Pipeline</div>
+      <button class="tbtn" onclick="runT(6)" id="tb6"><span class="tnum">6</span><div class="tinfo"><div class="tname">L1 Watch — Single Anomaly</div><div class="tdesc">E4 tilt >2σ for 5min. IF flags. Z-score confirmed.</div></div><span class="ttag warn">L1</span></button>
+      <button class="tbtn" onclick="runT(7)" id="tb7"><span class="tnum">7</span><div class="tinfo"><div class="tname">L2 Warning — Spatial Cluster</div><div class="tdesc">E4+E5+E6 anomalous. LSTM confirms. Siren ON.</div></div><span class="ttag fail">L2</span></button>
+      <button class="tbtn" onclick="runT(8)" id="tb8"><span class="tnum">8</span><div class="tinfo"><div class="tname">L3 Critical — Evacuation</div><div class="tdesc">PINN: onset &lt;18h. 3/3 models unanimous. DGMS call.</div></div><span class="ttag fail">L3</span></button>
+      <button class="tbtn" onclick="runT(9)" id="tb9"><span class="tnum">9</span><div class="tinfo"><div class="tname">False Positive Rejection</div><div class="tdesc">IF flags thermal drift. LSTM+PINN disagree. Rejected.</div></div><span class="ttag pass">REJECT</span></button>
+    </div>
+
+    <div class="grp">
+      <div class="grp-label">🔧 Hardware & Environment</div>
+      <button class="tbtn" onclick="runT(10)" id="tb10"><span class="tnum">10</span><div class="tinfo"><div class="tname">Sensor Drift + Auto-Zero</div><div class="tdesc">MPU6050 temp drift. Cross-node consensus. Calibrated.</div></div><span class="ttag warn">CALIBRATE</span></button>
+      <button class="tbtn" onclick="runT(11)" id="tb11"><span class="tnum">11</span><div class="tinfo"><div class="tname">Battery Low / Solar Cycle</div><div class="tdesc">N3 at 12%. Deep sleep. TP4056 solar recharge.</div></div><span class="ttag warn">POWER</span></button>
+      <button class="tbtn" onclick="runT(12)" id="tb12"><span class="tnum">12</span><div class="tinfo"><div class="tname">Internet Loss — Offline Mode</div><div class="tdesc">All gateways lose 4G. SQLite buffer. Alerts continue.</div></div><span class="ttag pass">OFFLINE</span></button>
+      <button class="tbtn" onclick="runT(13)" id="tb13"><span class="tnum">13</span><div class="tinfo"><div class="tname">Data Tampering Blocked</div><div class="tdesc">Spoofed LoRa packet. AES+HMAC+seq# rejects.</div></div><span class="ttag pass">BLOCKED</span></button>
+    </div>
+
+    <div class="grp">
+      <div class="grp-label">🔴 Real-Life Incident Simulations</div>
+      <button class="tbtn" onclick="runT(14)" id="tb14"><span class="tnum">14</span><div class="tinfo"><div class="tname">🏚️ Jharia Monsoon Subsidence</div><div class="tdesc">Sep 2026: Rain → old voids → progressive collapse. 18h warning.</div></div><span class="ttag real">JHARIA</span></button>
+      <button class="tbtn" onclick="runT(15)" id="tb15"><span class="tnum">15</span><div class="tinfo"><div class="tname">⛏️ Keshalpur Tunnel Collapse</div><div class="tdesc">Sep 13: Illegal mining void collapse. 3 deaths. 2h warning.</div></div><span class="ttag real">KESHALPUR</span></button>
+      <button class="tbtn" onclick="runT(16)" id="tb16"><span class="tnum">16</span><div class="tinfo"><div class="tname">🏠 Sijua Ground Caving</div><div class="tdesc">Sep 8: Houses damaged, child died. 12h warning possible.</div></div><span class="ttag real">SIJUA</span></button>
+      <button class="tbtn" onclick="runT(17)" id="tb17"><span class="tnum">17</span><div class="tinfo"><div class="tname">🔥 Coal Fire Subsidence</div><div class="tdesc">Jharia fire zone: thermal weakening. Weeks of warning.</div></div><span class="ttag real">FIRE</span></button>
+      <button class="tbtn" onclick="runT(18)" id="tb18"><span class="tnum">18</span><div class="tinfo"><div class="tname">⛰️ Multi-Seam Cascade</div><div class="tdesc">Overlapping extraction. 8 nodes, 2 zones. Cross-zone ML.</div></div><span class="ttag real">CASCADE</span></button>
+      <button class="tbtn" onclick="runT(19)" id="tb19"><span class="tnum">19</span><div class="tinfo"><div class="tname">💥 Blast Vibration Event</div><div class="tdesc">Blast vs subsidence. LSTM temporal analysis distinguishes.</div></div><span class="ttag real">BLAST</span></button>
+      <button class="tbtn" onclick="runT(20)" id="tb20"><span class="tnum">20</span><div class="tinfo"><div class="tname">🌧️ Monsoon Flood + Damage</div><div class="tdesc">5 nodes destroyed. Network fragments. 15/20 survive.</div></div><span class="ttag real">FLOOD</span></button>
+      <button class="tbtn" onclick="runT(21)" id="tb21"><span class="tnum">21</span><div class="tinfo"><div class="tname">🔥 Full System Stress</div><div class="tdesc">ALL failures simultaneously. Maximum resilience test.</div></div><span class="ttag fail">STRESS</span></button>
+    </div>
+  </div>
+
+  <!-- ══ CENTER: CANVAS ══ -->
+  <div class="panel-c">
+    <canvas id="cv"></canvas>
+    <div class="overlay-top">
+      <div class="chip"><span class="dot" style="background:var(--green)"></span>LoRa 865MHz IN865</div>
+      <div class="chip"><span class="dot" style="background:var(--blue)"></span>AODV Routing</div>
+      <div class="chip" id="cPkt"><span class="dot" style="background:var(--cyan)"></span>51 pkt/hr/node</div>
+      <div class="chip" id="cLat"><span class="dot" style="background:var(--purple)"></span>698ms avg</div>
+      <div class="chip" id="cSim"><span class="dot" style="background:var(--pink)"></span>Speed: 1×</div>
+    </div>
+    <div class="manual-alerts">
+      <button class="ma-btn ml0" onclick="forceAlert(0)">L0</button>
+      <button class="ma-btn ml1" onclick="forceAlert(1)">L1</button>
+      <button class="ma-btn ml2" onclick="forceAlert(2)">L2</button>
+      <button class="ma-btn ml3" onclick="forceAlert(3)">L3</button>
+    </div>
+    <div class="legend">
+      <div class="lr"><span class="dot" style="background:var(--green);width:7px;height:7px;border-radius:50%;display:inline-block"></span>Node (Online)</div>
+      <div class="lr"><span class="dot" style="background:var(--red);width:7px;height:7px;border-radius:50%;display:inline-block"></span>Node (Offline)</div>
+      <div class="lr"><span class="dot" style="background:var(--yellow);width:7px;height:7px;border-radius:50%;display:inline-block"></span>Node (Warning)</div>
+      <div class="lr"><span class="dot" style="background:var(--blue);width:7px;height:7px;border-radius:50%;display:inline-block"></span>Zone Gateway</div>
+      <div class="lr"><span class="dot" style="background:var(--purple);width:7px;height:7px;border-radius:50%;display:inline-block"></span>Cloud</div>
+      <div class="lr"><span style="display:inline-block;width:12px;height:2px;background:var(--cyan)"></span>LoRa Link</div>
+    </div>
+    <div class="node-detail" id="ndPanel">
+      <div class="nd-header"><span class="nd-id" id="ndId">--</span><button class="nd-close" onclick="closeND()">✕</button></div>
+      <div class="nd-grid" id="ndGrid"></div>
+      <div class="nd-chart"><canvas id="ndChart"></canvas><div class="nd-chart-lbl">Tilt (° last 60s)</div></div>
+    </div>
+    <div class="sc-info" id="scInfo">
+      <div class="sc-title">👋 Welcome — 20-Node Mine Simulator</div>
+      <div class="sc-body">Select a <strong>test scenario</strong> from the left panel to begin.<br><br><strong>20 ESP32+LoRa nodes</strong> across <strong>3 mine zones</strong> (East: 7, West: 7, North: 6) with <strong>3 zone gateways</strong>.<br><br>• <strong>Click</strong> any node to inspect live sensor data<br>• <strong>Drag</strong> nodes to reposition<br>• Use <strong>L0–L3</strong> buttons for manual alerts<br>• <strong>Speed control</strong>: 1×–10× simulation speed<br>• <strong>Export JSON</strong> for test reports</div>
+    </div>
+  </div>
+
+  <!-- ══ RIGHT: METRICS + LOGS ══ -->
+  <div class="panel-r">
+    <div class="mgrid">
+      <div class="mc cg" id="mN"><div class="ml">Nodes</div><div class="mv">20/20</div><div class="ms">All 3 zones</div></div>
+      <div class="mc cb" id="mML"><div class="ml">ML Score</div><div class="mv">0.12</div><div class="ms">IF:0.08 LSTM:0.10 PINN:0.18</div></div>
+      <div class="mc cg" id="mGW"><div class="ml">Gateways</div><div class="mv">3/3</div><div class="ms">All online</div></div>
+      <div class="mc cb" id="mBuf"><div class="ml">Buffer</div><div class="mv">0%</div><div class="ms">0 / 30240 rows</div></div>
+    </div>
+    <div class="zone-sec">
+      <div class="sec-title" style="margin-bottom:6px">Zone Status</div>
+      <div class="zone-grid">
+        <div class="zone-card ok" id="zE"><div class="zn">EAST</div><div class="zs">7/7 nodes</div></div>
+        <div class="zone-card ok" id="zW"><div class="zn">WEST</div><div class="zs">7/7 nodes</div></div>
+        <div class="zone-card ok" id="zN"><div class="zn">NORTH</div><div class="zs">6/6 nodes</div></div>
+      </div>
+    </div>
+    <div class="log-sec">
+      <div class="log-hdr"><div class="sec-title">System Log</div><button class="log-clr" onclick="clearLog()">Clear</button></div>
+      <div class="log-box" id="logBox"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Scripts — order matters: engine first, then tests -->
+<script src="sim-engine.js"></script>
+<script src="sim-tests.js"></script>
+</body>
+</html>
